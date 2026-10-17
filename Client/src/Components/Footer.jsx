@@ -1,4 +1,6 @@
 import { motion } from "motion/react";
+import { Link } from "react-router-dom";
+import { assets } from "../assets/assets";
 
 const Footer = () => {
   const linkSections = [
@@ -6,29 +8,26 @@ const Footer = () => {
       title: "Quick Links",
       links: [
         { label: "Home", href: "/" },
-        { label: "Best Sellers", href: "/tractors" },
-        { label: "Offers & Deals", href: "/offers" },
-        { label: "Contact Us", href: "/contact" },
-        { label: "FAQs", href: "/faq" },
+        { label: "All Tractors", href: "/tractor" },
+        { label: "My Bookings", href: "/mybooking" },
+        { label: "Owner Dashboard", href: "/owner" },
       ],
     },
     {
-      title: "Need Help?",
+      title: "Services",
       links: [
-        { label: "Delivery Information", href: "/delivery" },
-        { label: "Return & Refund Policy", href: "/returns" },
-        { label: "Payment Methods", href: "/payments" },
-        { label: "Track Your Order", href: "/track-order" },
-        { label: "Contact Us", href: "/contact" },
+        { label: "Tractor Rentals", href: "/tractor" },
+        { label: "Equipment Booking", href: "/tractor" },
+        { label: "Seasonal Plowing", href: "/tractor" },
+        { label: "Harvester & Implements", href: "/tractor" },
       ],
     },
     {
-      title: "Follow Us",
+      title: "Contact & Social",
       links: [
-        { label: "Instagram", href: "https://instagram.com" },
-        { label: "Twitter", href: "https://twitter.com" },
-        { label: "Facebook", href: "https://facebook.com" },
-        { label: "YouTube", href: "https://youtube.com" },
+        { label: "Uttar Pradesh, India", href: "#" },
+        { label: "support@tractorhub.in", href: "mailto:support@tractorhub.in" },
+        { label: "+91 98765 43210", href: "tel:+919876543210" },
       ],
     },
   ];
@@ -42,15 +41,16 @@ const Footer = () => {
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <img
-            className="w-32"
-            src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/dummyLogo/dummyLogoColored.svg"
-            alt="Logo"
-          />
+          <Link to="/">
+            <img
+              className="h-10 rounded-2xl w-36 border-2 object-contain"
+              src={assets.Rental_Logo3}
+              alt="TractorHub Logo"
+            />
+          </Link>
           <p className="max-w-xl mt-6 text-gray-500">
-            TractorRent makes it easy to find reliable tractors for every
-            farming need. Compare options, book with confidence, and get the
-            right equipment when you need it.
+            TractorHub makes it easy to find reliable agricultural tractors and heavy farming machinery.
+            Compare models, book by day, and get the right equipment delivered for your next harvest.
           </p>
         </motion.div>
 
@@ -70,9 +70,15 @@ const Footer = () => {
               <ul className="space-y-2 text-sm text-gray-500">
                 {section.links.map((link, i) => (
                   <li key={i}>
-                    <a href={link.href} className="hover:text-blue-600 transition">
-                      {link.label}
-                    </a>
+                    {link.href.startsWith("/") ? (
+                      <Link to={link.href} className="hover:text-blue-600 transition">
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a href={link.href} className="hover:text-blue-600 transition">
+                        {link.label}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -82,7 +88,7 @@ const Footer = () => {
       </div>
 
       <p className="py-4 text-center text-sm text-gray-500">
-        © 2025 PrebuiltUI. All Rights Reserved.
+        © {new Date().getFullYear()} TractorHub. All Rights Reserved.
       </p>
     </footer>
   );

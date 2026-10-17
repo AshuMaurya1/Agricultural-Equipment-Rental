@@ -3,15 +3,33 @@ import {motion} from 'motion/react'
 
 const Testimonial = () => {
     const testimonials = [
-        {name: "Emma Rodriguez", location: "Barcelona, Spain", image: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=200", rating: 5, review: "Exceptional service and attention to detail. Everything was handled professionally and efficiently from start to finish. Highly recommended!" },
-        {name: "Liam Johnson", location: "New York, USA", image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200", rating: 4, review: "I’m truly impressed by the quality and consistency. The entire process was smooth, and the results exceeded all expectations. Thank you!" },
-        {name: "Sophia Lee", location: "Seoul, South Korea", image: "https://images.unsplash.com/photo-1701615004837-40d8573b6652?q=80&w=200", rating: 5, review: "Fantastic experience! From start to finish, the team was professional, responsive, and genuinely cared about delivering great results." }
+        {
+            name: "Ramesh Patel",
+            location: "Varanasi, UP",
+            image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200",
+            rating: 5,
+            review: "Rented a Mahindra 275 DI for my wheat harvest season. The tractor was in excellent mechanical condition, delivered right on time, and saved us massive labor expenses!"
+        },
+        {
+            name: "Suresh Yadav",
+            location: "Gorakhpur, UP",
+            image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200",
+            rating: 5,
+            review: "Very smooth booking experience. Swaraj 735 FE had great fuel efficiency for plowing 10 acres. Transparent daily rates with zero hidden charges. Highly recommended!"
+        },
+        {
+            name: "Anil Maurya",
+            location: "Mirzapur, UP",
+            image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200",
+            rating: 5,
+            review: "As an agricultural contractor, I frequently need extra equipment during peak sowing seasons. TractorHub provides reliable machines whenever my local fleet is fully booked."
+        }
     ];
   return (
    <div className="flex flex-col mt-25">
     <Title
-        title="What Our Former Guests Say"
-        subtitle="Discover why discerning travelers choose StayVenture for their comfortable accommodations around the world"/>
+        title="What Farmers & Contractors Say"
+        subtitle="Discover why farmers across Uttar Pradesh trust TractorHub for modern, reliable farming equipment"/>
 
     <div className="flex flex-wrap justify-center gap-8 mt-12 px-4 mb-20">
         {testimonials.map((testimonial, index) => (

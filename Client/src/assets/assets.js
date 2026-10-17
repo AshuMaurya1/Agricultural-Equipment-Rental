@@ -55,6 +55,11 @@ import Eye_icon from './eye.svg'
 import Delete_icon from './trash.svg'
 import Booking from './department-store.svg'
 import Ace from './ACE_60HP.avif'
+import Banner1 from './Cover_Banner.png'
+import Banner2 from './Cover_Banner.svg'
+import Rental_Logo1 from './Rental_Icon.png'
+import Rental_Logo2 from './Rental_Icon.svg'
+import Rental_Logo3 from './Rental_Logo.svg'
 
 
 export const cityList = [
@@ -129,7 +134,12 @@ export const assets = {
     Eye_icon,
     Delete_icon,
     Booking ,
-    Ace
+    Ace,
+    Banner1,
+    Banner2,
+    Rental_Logo1,
+    Rental_Logo2,
+    Rental_Logo3,
 };
 
 export const assetes = assets;

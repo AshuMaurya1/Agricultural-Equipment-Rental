@@ -4,6 +4,7 @@ import {toast} from 'react-hot-toast'
 import { useNavigate } from "react-router-dom";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
+axios.defaults.withCredentials = true;
 
 export const AppContext = createContext();
 
@@ -21,6 +22,13 @@ export const AppProvider = ({ children }) =>{
 
     const [tractors, setTractors] = useState([])
 
+    const clearLocalSession = useCallback(() => {
+        setToken(null)
+        setUser(null)
+        setIsOwner(false)
+        delete axios.defaults.headers.common['Authorization']
+    }, [])
+
     //Function to Check is user is Logged in 
     const fetchUser = useCallback(async () => {
         try{
@@ -35,18 +43,14 @@ export const AppProvider = ({ children }) =>{
             if (error.response?.status === 401) {
                 // The token saved in this browser is expired or no longer valid.
                 // Clear it so the app does not repeatedly call protected routes.
-                localStorage.removeItem('token')
-                setToken(null)
-                setUser(null)
-                setIsOwner(false)
-                delete axios.defaults.headers.common['Authorization']
+                clearLocalSession()
                 toast.error('Your session has expired. Please log in again.')
                 return
             }
 
             toast.error(error.response?.data?.message || error.message)
         }
-    }, [navigate])
+    }, [navigate, clearLocalSession])
     // FUnction to fetch all cars from the server
 
     const fetchTractors = useCallback(async () => {
@@ -58,23 +62,35 @@ export const AppProvider = ({ children }) =>{
         }
     }, [])
 
+    const refreshSession = useCallback(async () => {
+        try {
+            const { data } = await axios.post('/api/user/refresh')
+            if (!data.success || !data.token) return false
+            setToken(data.token)
+            return true
+        } catch {
+            return false
+        }
+    }, [])
+
     // Function to Log out the User
-    const logout = () => {
-        localStorage.removeItem('token')
-        setToken(null)
-        setUser(null)
-        setIsOwner(false)
-        delete axios.defaults.headers.common['Authorization']
+    const logout = async () => {
+        try {
+            await axios.post('/api/user/logout')
+        } catch {
+            // Clear this browser even if the server session already expired.
+        } finally {
+            clearLocalSession()
+        }
         toast.success('You have Been Logged out')
     }
 
 
     // useEffect to retrieve the token from localStorage
     useEffect(()=>{
-        const token = localStorage.getItem('token')
-        setToken(token)
+        refreshSession()
         fetchTractors()
-    }, [fetchTractors])
+    }, [fetchTractors, refreshSession])
 
     // useEffect to fetch user data when token is Available
     useEffect(() => {
@@ -83,6 +99,12 @@ export const AppProvider = ({ children }) =>{
             fetchUser()
         }
     }, [token, fetchUser])
+
+    // Access tokens are short-lived; the HTTP-only refresh cookie safely rotates them.
+    useEffect(() => {
+        const interval = setInterval(refreshSession, 12 * 60 * 1000)
+        return () => clearInterval(interval)
+    }, [refreshSession])
 
     const value = {
         navigate,
@@ -98,6 +120,8 @@ export const AppProvider = ({ children }) =>{
         showLogin,
         setShowLogin,
         logout,
+        clearLocalSession,
+        refreshSession,
         fetchTractors,
         tractors,
         setTractors,

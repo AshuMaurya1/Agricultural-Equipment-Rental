@@ -9,11 +9,10 @@ const NavbarOwner = () => {
   return (
     <div className='flex items-center justify-between px-6 md:px-10 py-4 text-gray-500 border-b border-borderColor relative transition-all'>
         <Link to='/'>
-        <img src={assets.Tractor_Logo} alt='logo' className='h-10 rounded-2xl w-35'/>
+        <img src={assets.Rental_Logo3} alt='logo' className='h-10 rounded-2xl w-35 border-2'/>
         </Link>
         <p> Welcome, {user?.name || "Owner"}</p>
     </div>
   )
 }
-
 export default NavbarOwner
