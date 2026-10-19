@@ -33,13 +33,14 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="px-6 md:px-16 lg:px-24 xl:px-32 border-t border-gray-200 mt-10">
-      <div className="flex flex-col md:flex-row justify-between gap-10 py-10 border-b border-gray-300">
+    <footer className="px-4 sm:px-6 md:px-16 lg:px-24 xl:px-32 border-t border-gray-200 mt-10">
+      <div className="flex flex-col lg:flex-row justify-between gap-10 py-10 border-b border-gray-300">
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
+          className="lg:w-[36%]"
         >
           <Link to="/">
             <img
@@ -59,10 +60,10 @@ const Footer = () => {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
-          className="flex flex-wrap justify-between w-full md:w-[45%] gap-8"
+          className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 lg:w-[58%] lg:grid-cols-3 lg:gap-6 xl:gap-10"
         >
           {linkSections.map((section, index) => (
-            <div key={index}>
+            <div key={index} className="min-w-0">
               <h3 className="font-semibold text-gray-900 mb-3">
                 {section.title}
               </h3>
