@@ -35,7 +35,7 @@ import user from './user.svg'
 import fuelIcon from './petrol-pump.svg'
 import Location_icon from './location.svg'
 import Arrow_icon from './arrow-big-right-line.svg'
-import Banner_card from './download_banner.jpg'
+import Banner_card from './Banner_card.avif'
 import Gear from './gear.svg'
 import Check from './check.svg'
 import Filter from './filter.svg';

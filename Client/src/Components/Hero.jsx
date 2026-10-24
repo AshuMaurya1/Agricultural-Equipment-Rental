@@ -141,7 +141,7 @@ const Hero = () => {
 
               {/* Main Machine Card */}
               <div className="relative bg-white rounded-3xl p-2.5 sm:p-3 border border-stone-200 shadow-xl overflow-hidden group">
-                <div className="relative h-56 sm:h-64 md:h-72 rounded-2xl overflow-hidden bg-stone-100">
+                <div className="relative h-60 sm:h-72 md:h-80 lg:h-88 xl:h-96 rounded-2xl overflow-hidden bg-stone-100">
                   <img
                     src={assets.Ace || assets.download1}
                     alt="ACE Heavy Duty Tractor"
@@ -180,7 +180,7 @@ const Hero = () => {
                 <motion.div
                   animate={{ y: [0, 5, 0] }}
                   transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut", delay: 1 }}
-                  className="absolute top-1/2 right-2 sm:-right-2 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-2xl shadow-lg border border-stone-100 flex items-center gap-2"
+                  className="absolute top-1/2 right-3 sm:right-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-2xl shadow-lg border border-stone-100 flex items-center gap-2"
                 >
                   <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                   <div>
