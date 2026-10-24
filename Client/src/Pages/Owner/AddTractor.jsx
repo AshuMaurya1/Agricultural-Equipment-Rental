@@ -116,7 +116,7 @@ const AddTractor = () => {
   };
 
   return (
-    <div className="mx-4 py-10 flex-1">
+    <div className="px-3 sm:px-6 md:px-8 py-6 sm:py-8 flex-1 max-w-4xl mx-auto">
       <Title
         title="Add New Tractor"
         subtitle="Fill in the details to list a new tractor for booking."
@@ -124,7 +124,7 @@ const AddTractor = () => {
 
       <form
         onSubmit={onSubmitHandler}
-        className="flex flex-col gap-5 mt-6 max-w-xl text-sm text-gray-600 bg-white p-6 rounded-xl border border-borderColor shadow-xs"
+        className="flex flex-col gap-5 mt-6 max-w-2xl text-sm text-stone-600 bg-white p-4 sm:p-6 md:p-8 rounded-3xl border border-stone-200 shadow-xs"
       >
         {/* Image Upload */}
         <div className="flex items-center gap-4">

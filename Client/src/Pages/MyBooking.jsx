@@ -95,7 +95,7 @@ const MyBooking = () => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="px-6 md:px-16 lg:px-24 xl:px-32 2xl:px-48 mt-12 mb-20 text-sm max-w-7xl mx-auto"
+      className="px-3 sm:px-6 md:px-12 lg:px-20 mt-6 sm:mt-12 mb-20 text-sm max-w-7xl mx-auto"
     >
       <Title 
         title={t('myBookings')} 
@@ -116,7 +116,7 @@ const MyBooking = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.08, duration: 0.4 }}
               key={booking._id}
-              className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 border border-borderColor rounded-2xl bg-white shadow-xs hover:shadow-md transition-shadow"
+              className="grid grid-cols-1 md:grid-cols-4 gap-4 sm:gap-6 p-4 sm:p-6 border border-stone-200 rounded-3xl bg-white shadow-xs hover:shadow-md transition-shadow"
             >
               {/* Image & Machine Quick Specs */}
               <div className="flex flex-col space-y-2">

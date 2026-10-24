@@ -1,58 +1,82 @@
 import Title from './Title'
-import CarCards from './CarCards'
-import { assets, dummyTractorData } from '../assets/assets'
+import TractorCard from './TractorCard'
+import { dummyTractorData } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import { useAppContext } from '../context/AppContext'
+import { useLanguage } from '../context/LanguageContext'
 import { motion } from 'motion/react'
 
 const FeatureSection = () => {
-    const navigate = useNavigate()
-    const { tractors } = useAppContext();
-    const displayList = tractors && tractors.length > 0 ? tractors.slice(0, 6) : dummyTractorData.slice(0, 6);
+  const navigate = useNavigate()
+  const { tractors } = useAppContext()
+  const { lang } = useLanguage()
+  const displayList = tractors && tractors.length > 0 ? tractors.slice(0, 6) : dummyTractorData.slice(0, 6)
 
   return (
-    <motion.div 
-    initial={{opacity: 0, y : 40}}
-    whileInView={{opacity: 1, y: 0}}
-    transition={{duration : 1, ease: "easeOut"}}
-    className='flex flex-col items-center py-20 px-6 md:px-16 lg:px-24 xl:px-32'>
-
-        <motion.div
-            initial={{opacity: 0, y : 20}}
-            whileInView={{opacity: 1, y: 0}}
-            transition={{duration : 0.8, delay : 0.2}}
-        >
-            <Title title='Featured Tractors' subtitle='Explore our selection of reliable, heavy-duty tractors available for your next harvest.'/>
-        </motion.div>
-
-        <motion.div
-        initial={{opacity: 0, y: 60}}
-        whileInView={{opacity: 1, y: 0}}
-        transition={{duration: 0.8, delay: 0.3}}
-        className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 w-full max-w-7xl'>
-            {
-                displayList.map((tractor) => (
-                    <motion.div
-                    initial={{opacity: 0, scale: 0.98}}
-                    whileInView={{opacity: 1, scale: 1}}
-                    transition={{duration: 0.6, ease: 'easeOut'}}
-                    key={tractor._id || tractor.id}>
-                        <CarCards tractor={tractor}/> 
-                    </motion.div>
-                ))
+    <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+        className="text-center"
+      >
+        <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+          {lang === 'hi' ? 'उच्च मांग वाले मॉडल' : 'High Demand Fleet'}
+        </span>
+        <div className="mt-3">
+          <Title
+            title={lang === 'hi' ? 'प्रमुख आधुनिक ट्रैक्टर' : 'Featured Agricultural Equipment'}
+            subtitle={
+              lang === 'hi'
+                ? 'जुताई, बुवाई व कटाई के लिए उच्च क्षमता वाले विश्वसनीय ट्रैक्टर तुरंत उपलब्ध।'
+                : 'Explore high-performance tractors with optional implements and certified operators ready for your next harvest.'
             }
-        </motion.div> 
-        <motion.button 
-        initial={{opacity: 0, y: 20}}
-        whileInView={{opacity: 1, y: 0}}
-        transition={{delay: 0.4, duration: 0.4}}
-        onClick={() => {
-            navigate('/tractor'); window.scrollTo(0, 0)
-        }} className='flex items-center justify-center gap-2 px-8 py-3 bg-white border border-borderColor hover:bg-gray-50 text-gray-700 font-medium rounded-xl mt-12 cursor-pointer shadow-xs hover:shadow-md transition'>
-            Explore all tractors <img src={assets.Arrow_icon} alt="Arrow" className="w-4 h-4" />
-        </motion.button>
+          />
+        </div>
+      </motion.div>
 
-    </motion.div>
+      {/* Grid of Tractor Cards */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.15 }}
+        viewport={{ once: true }}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mt-12 w-full"
+      >
+        {displayList.map((tractor) => (
+          <motion.div
+            key={tractor._id || tractor.id}
+            initial={{ opacity: 0, scale: 0.98 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4 }}
+            viewport={{ once: true }}
+          >
+            <TractorCard tractor={tractor} />
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Explore All CTA Button */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.4 }}
+        viewport={{ once: true }}
+        className="flex justify-center mt-12"
+      >
+        <button
+          onClick={() => {
+            navigate('/tractor')
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }}
+          className="flex items-center justify-center gap-2 px-8 py-3.5 bg-white border border-stone-200 hover:border-emerald-600 hover:text-emerald-700 hover:bg-emerald-50/50 text-slate-800 font-bold rounded-2xl cursor-pointer shadow-xs hover:shadow-md transition text-sm group"
+        >
+          <span>{lang === 'hi' ? 'सभी ट्रैक्टर ब्राउज़ करें' : 'Explore All Tractors & Implements'}</span>
+          <span className="text-emerald-600 group-hover:translate-x-1 transition-transform">→</span>
+        </button>
+      </motion.div>
+    </section>
   )
 }
 

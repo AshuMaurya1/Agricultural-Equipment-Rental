@@ -11,42 +11,42 @@ import ManageTractors from './Pages/Owner/ManageTractors'
 import ManageBooking from './Pages/Owner/ManageBooking'
 import Dashboard from './Pages/Owner/Dashboard'
 import Login from './Components/Login'
-import { Toaster} from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 import { useAppContext } from './context/AppContext'
 import SecuritySessions from './Pages/SecuritySessions'
 import ResetPassword from './Pages/ResetPassword'
 import VerifyEmail from './Pages/VerifyEmail'
 
 const App = () => {
-  const {showLogin} = useAppContext()
+  const { showLogin } = useAppContext()
   const isOwnerPath = useLocation().pathname.startsWith('/owner')
 
-
   return (
-    <div>
-      <Toaster/>
-      {showLogin && <Login/>}
+    <div className="min-h-screen flex flex-col justify-between overflow-x-hidden w-full max-w-full">
+      <Toaster position="top-right" />
+      {showLogin && <Login />}
 
-      {!isOwnerPath && <Navbar/>}
+      {!isOwnerPath && <Navbar />}
 
-      <Routes>
-        <Route path='/' element={<Home/>}/>
-        <Route path='/tractor-details/:id' element={<TractorDetails/>}/>
-        <Route path='/tractor' element={<Tractors/>}/>
-        <Route path='/mybooking' element={<MyBooking/>}/>
-        <Route path='/security-sessions' element={<SecuritySessions/>}/>
-        <Route path='/reset-password' element={<ResetPassword/>}/>
-        <Route path='/verify-email' element={<VerifyEmail/>}/>
-        <Route path='/owner' element ={<Layout/>}>
-          <Route index element ={<Dashboard/>}/>
-          <Route path='add-tractor' element ={<AddTractor/>}/>
-          <Route path='manage-tractor' element ={<ManageTractors/>}/>
-          <Route path='manage-booking' element ={<ManageBooking/>}/>
-        </Route>
+      <main className="flex-1 w-full max-w-full">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/tractor-details/:id" element={<TractorDetails />} />
+          <Route path="/tractor" element={<Tractors />} />
+          <Route path="/mybooking" element={<MyBooking />} />
+          <Route path="/security-sessions" element={<SecuritySessions />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/owner" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="add-tractor" element={<AddTractor />} />
+            <Route path="manage-tractor" element={<ManageTractors />} />
+            <Route path="manage-booking" element={<ManageBooking />} />
+          </Route>
+        </Routes>
+      </main>
 
-      </Routes>
-
-      {!isOwnerPath &&<Footer />}
+      {!isOwnerPath && <Footer />}
     </div>
   )
 }

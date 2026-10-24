@@ -1,15 +1,63 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @import "tailwindcss"; 
 
-*{
-    font-family: 'Outfit', sans-serif;
+* {
+  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
 }
 
-@theme{
-    --color-primary: #2563eb;
-    --color-primary-dull : #1E90FF80;
-    --color-light: #F0F0F0;
-    --color-borderColor: #f5f5f5;
+@theme {
+  --color-primary: #15803d;
+  --color-primary-hover: #166534;
+  --color-primary-light: #ecfdf5;
+  --color-primary-dull: #15803d25;
+  
+  --color-accent: #d97706;
+  --color-accent-hover: #b45309;
+  --color-accent-light: #fef3c7;
+  
+  --color-light: #f7f8f5;
+  --color-surface: #ffffff;
+  --color-borderColor: #e5e7eb;
+  --color-darkSlate: #0f172a;
+}
+
+/* Custom modern agri utility classes */
+body {
+  background-color: var(--color-light);
+  color: #1e293b;
+  overflow-x: hidden;
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.agri-card {
+  background: #ffffff;
+  border: 1px solid #e7e8e2;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.agri-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px -10px rgba(21, 128, 61, 0.12), 0 6px 12px -4px rgba(0, 0, 0, 0.04);
+}
+
+/* Subtle custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1ee;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
