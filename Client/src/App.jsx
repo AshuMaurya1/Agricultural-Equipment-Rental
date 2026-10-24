@@ -31,7 +31,7 @@ const App = () => {
 
   return (
     <div className="min-h-screen flex flex-col justify-between overflow-x-hidden w-full max-w-full relative">
-      <Toaster position="top-right" />
+      <Toaster position="top-center" />
       {showLogin && <Login />}
 
       {!isOwnerPath && <Navbar />}
