@@ -1,0 +1,13 @@
+# Robots.txt for TractorHub (Agricultural Equipment & Tractor Rental Network)
+User-agent: *
+Allow: /
+Allow: /tractor
+Allow: /tractor-details/*
+
+# Keep private account and management endpoints unindexed
+Disallow: /owner/
+Disallow: /security-sessions
+Disallow: /reset-password
+Disallow: /verify-email
+
+Sitemap: https://agricultural-equipment-rental.vercel.app/sitemap.xml
