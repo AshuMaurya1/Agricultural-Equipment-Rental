@@ -17,6 +17,7 @@ import { useAppContext } from './context/AppContext'
 import SecuritySessions from './Pages/SecuritySessions'
 import ResetPassword from './Pages/ResetPassword'
 import VerifyEmail from './Pages/VerifyEmail'
+import FloatingHelpline from './Components/FloatingHelpline'
 
 const App = () => {
   const { showLogin } = useAppContext()
@@ -54,6 +55,7 @@ const App = () => {
       </main>
 
       {!isOwnerPath && <Footer />}
+      {!isOwnerPath && <FloatingHelpline />}
     </div>
   )
 }

@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 const FloatingHelpline = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const { lang } = useLanguage();
 
   useEffect(() => {
@@ -22,6 +23,8 @@ const FloatingHelpline = () => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  if (!isVisible) return null;
 
   return (
     <aside aria-label="Quick helpline and navigation" className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-40 flex flex-col items-end gap-2.5">
@@ -45,6 +48,15 @@ const FloatingHelpline = () => {
 
       {/* Floating Helpline Pill / Expandable Menu */}
       <div className="relative">
+        <button
+          type="button"
+          onClick={() => setIsVisible(false)}
+          aria-label="Close helpline"
+          title="Close helpline"
+          className="absolute -top-2 -right-1 z-10 flex h-5 w-5 items-center justify-center rounded-full border border-stone-200 bg-white text-xs font-bold leading-none text-stone-500 shadow-sm hover:bg-stone-100 hover:text-stone-800 cursor-pointer"
+        >
+          &times;
+        </button>
         <AnimatePresence>
           {isOpen && (
             <motion.div
