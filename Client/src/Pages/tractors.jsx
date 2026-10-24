@@ -76,6 +76,8 @@ const Tractors = () => {
     try {
       const { data } = await axios.post("/api/booking/check-availability", {
         location: pickupLocation,
+        district: selectedDistrict !== "All" ? selectedDistrict : undefined,
+        block: selectedBlock !== "All" ? selectedBlock : undefined,
         startDate: pickupDate,
         endDate: returnDate,
       });
