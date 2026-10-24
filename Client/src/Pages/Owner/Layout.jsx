@@ -18,7 +18,7 @@ const Layout = () => {
       <NavbarOwner />
       <div className="flex flex-1 min-h-[calc(100vh-65px)]">
         <SideBar />
-        <main className="flex-1 min-w-0 overflow-x-hidden">
+        <main className="flex-1 min-w-0 overflow-x-hidden ml-14 sm:ml-16 md:ml-60">
           <Outlet />
         </main>
       </div>

@@ -56,7 +56,8 @@ const SideBar = () => {
     }
 
   return (
-    <div className="relative min-h-screen md:flex flex-col items-center pt-8 max-w-13 md:max-w-60 w-full border-r border-borderColor text-sm">
+    <aside className="fixed inset-y-0 top-[69px] left-0 z-30 h-[calc(100vh-69px)] w-14 shrink-0 overflow-y-auto border-r border-borderColor bg-stone-50 text-sm sm:w-16 md:w-60 md:flex md:flex-col md:items-center md:pt-8">
+      <div className="flex flex-col items-center pt-5 md:pt-0">
         <div className="group relative">
             <label htmlFor="image">
                 <img src={previewUrl || profileImage || assets.user} alt={user?.name || "Owner"} className="h-9 md:h-14 w-9 md:w-14 rounded-full mx-auto"/>
@@ -71,21 +72,22 @@ const SideBar = () => {
             </label>
         </div>
         {image && (
-            <button onClick={updateImage} className="absolute top-0 right-0 flex p-2 gap-1 bg-primary/10 text-primary cursor-pointer">Save <img src={assets.Check} alt="check" width={13}/></button>
+            <button onClick={updateImage} className="absolute top-0 right-0 flex items-center p-1.5 md:p-2 gap-1 bg-primary/10 text-primary cursor-pointer"><span className="hidden md:inline">Save</span><img src={assets.Check} alt="Save image" width={13}/></button>
         )}
         <p className="mt-2 text-base max-md:hidden">{user?.name}</p>
+      </div>
 
-        <div className="w-full">
+        <nav className="w-full pt-2 md:pt-0" aria-label="Owner dashboard navigation">
             {OwnerMenuLinks.map((link, index) => (
-               <NavLink key={index} to={link.path} className={`relative flex items-center gap-2 w-full py-3 pl-4 first:mt-6 ${link.path === location.pathname ? 'bg-primary/10 text-primary ' : 'text-gray-600'}`}>
+               <NavLink key={index} to={link.path} title={link.name} className={`relative flex items-center justify-center md:justify-start md:gap-2 w-full min-h-12 py-3 md:pl-4 first:mt-3 md:first:mt-6 ${link.path === location.pathname ? 'bg-primary/10 text-primary ' : 'text-gray-600 hover:bg-stone-100'}`}>
                 <img src={link.path === location.pathname ? link.ColorIcon : link.Logo} alt=" tractor Icon" />
                 <span className="max-md:hidden">{link.name}</span>
-                <div className={`${link.path === location.pathname && 'bg-primary'} w-1.5 h-8 rounded-1 right-0 absolute`}></div>
+                <div className={`${link.path === location.pathname ? 'bg-primary' : ''} w-1 h-7 md:h-8 rounded-l right-0 absolute`}></div>
                </NavLink>
             ))}
-        </div>
+        </nav>
         
-    </div>
+    </aside>
   )
 }
 
