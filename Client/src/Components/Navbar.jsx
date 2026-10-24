@@ -100,15 +100,6 @@ const Navbar = () => {
             </div>
           </Link>
 
-          {/* Kisan Helpline Badge (Large Screens) */}
-          <div className="hidden xl:flex items-center gap-1.5 pl-4 border-l border-stone-200 text-xs text-stone-600">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
-            </span>
-            <span className="font-semibold text-emerald-800">Helpline:</span>
-            <a href="tel:18001208722" className="hover:text-emerald-700 hover:underline font-medium">1800-120-TRAK</a>
-          </div>
         </div>
 
         {/* Desktop Navigation & Actions */}
@@ -298,7 +289,7 @@ const Navbar = () => {
           </nav>
 
           {/* Mobile Helpline Card */}
-          <div className="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-xs">
+          <div className="hidden">
             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block mb-0.5">
               📞 24/7 Kisan Helpline
             </span>
