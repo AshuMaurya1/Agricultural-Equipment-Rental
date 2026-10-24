@@ -24,8 +24,6 @@ const FloatingHelpline = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (!isVisible) return null;
-
   return (
     <aside aria-label="Quick helpline and navigation" className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-40 flex flex-col items-end gap-2.5">
       {/* Scroll To Top Button (Appears when scrolled down) */}
@@ -47,6 +45,7 @@ const FloatingHelpline = () => {
       </AnimatePresence>
 
       {/* Floating Helpline Pill / Expandable Menu */}
+      {isVisible && (
       <div className="relative">
         <button
           type="button"
@@ -165,6 +164,7 @@ const FloatingHelpline = () => {
           </button>
         </motion.div>
       </div>
+      )}
     </aside>
   );
 };
