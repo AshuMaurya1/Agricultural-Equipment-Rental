@@ -7,6 +7,7 @@ import { useSearchParams } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import { useLanguage } from "../context/LanguageContext";
 import { motion } from "motion/react";
+import { parseLocation, getDistricts, getBlocks } from "../data/indiaLocations";
 
 const farmingOperations = [
   { id: "all", label: "All Operations", icon: "🌱" },
@@ -35,8 +36,41 @@ const Tractors = () => {
   const [selectedBrand, setSelectedBrand] = useState("All");
   const [selectedHP, setSelectedHP] = useState("All");
   const [selectedOperation, setSelectedOperation] = useState("all");
+  const [selectedDistrict, setSelectedDistrict] = useState("All");
+  const [selectedBlock, setSelectedBlock] = useState("All");
   const [onlyAvailable, setOnlyAvailable] = useState(false);
   const [maxPrice, setMaxPrice] = useState(3000);
+
+  // Compute available districts from active tractors + UP master list
+  const availableDistricts = useMemo(() => {
+    const set = new Set();
+    (tractors || []).forEach((t) => {
+      const parsed = parseLocation(t.location || "");
+      const d = t.district || parsed.district;
+      if (d) set.add(d);
+    });
+    // Add primary UP hubs
+    ["Varanasi", "Gorakhpur", "Prayagraj", "Mirzapur", "Sonbhadra", "Chandauli", "Jaunpur", "Ghazipur", "Azamgarh", "Lucknow", "Kanpur Nagar"].forEach(
+      (d) => set.add(d)
+    );
+    return ["All", ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+  }, [tractors]);
+
+  // Compute available blocks when district is chosen
+  const availableBlocks = useMemo(() => {
+    if (selectedDistrict === "All") return ["All"];
+    const baseBlocks = getBlocks("Uttar Pradesh", selectedDistrict);
+    const set = new Set(baseBlocks);
+    (tractors || []).forEach((t) => {
+      const parsed = parseLocation(t.location || "");
+      const d = t.district || parsed.district;
+      const b = t.block || parsed.block;
+      if (d && d.toLowerCase() === selectedDistrict.toLowerCase() && b) {
+        set.add(b);
+      }
+    });
+    return ["All", ...Array.from(set).sort((a, b) => a.localeCompare(b))];
+  }, [selectedDistrict, tractors]);
 
   const searchTractorsAvailability = useCallback(async () => {
     try {
@@ -106,9 +140,32 @@ const Tractors = () => {
         }
       }
 
-      // 6. Free text search
+      // 6. District Filter
+      if (selectedDistrict !== "All") {
+        const parsed = parseLocation(tractor.location || "");
+        const tractorDist = (tractor.district || parsed.district || "").toLowerCase();
+        const rawLoc = (tractor.location || "").toLowerCase();
+        const targetDist = selectedDistrict.toLowerCase();
+        if (!tractorDist.includes(targetDist) && !rawLoc.includes(targetDist)) {
+          return false;
+        }
+      }
+
+      // 7. Block / Tehsil Filter
+      if (selectedBlock !== "All") {
+        const parsed = parseLocation(tractor.location || "");
+        const tractorBlk = (tractor.block || parsed.block || "").toLowerCase();
+        const rawLoc = (tractor.location || "").toLowerCase();
+        const targetBlk = selectedBlock.toLowerCase();
+        if (!tractorBlk.includes(targetBlk) && !rawLoc.includes(targetBlk)) {
+          return false;
+        }
+      }
+
+      // 8. Free text search
       if (!searchTerm) return true;
 
+      const parsed = parseLocation(tractor.location || "");
       return [
         tractor.brand,
         tractor.model,
@@ -116,9 +173,22 @@ const Tractors = () => {
         tractor.transmission,
         tractor.fuelType,
         tractor.location,
+        tractor.district || parsed.district,
+        tractor.block || parsed.block,
+        tractor.state || parsed.state,
       ].some((value) => value?.toLowerCase().includes(searchTerm));
     });
-  }, [filteredTractors, onlyAvailable, maxPrice, selectedBrand, selectedHP, selectedOperation, input]);
+  }, [
+    filteredTractors,
+    onlyAvailable,
+    maxPrice,
+    selectedBrand,
+    selectedHP,
+    selectedOperation,
+    selectedDistrict,
+    selectedBlock,
+    input,
+  ]);
 
   return (
     <div className="pb-24">
@@ -187,6 +257,60 @@ const Tractors = () => {
                 <span>{op.label}</span>
               </button>
             ))}
+          </div>
+
+          {/* Location Filter: District -> Block Pills */}
+          <div className="mt-3.5 flex flex-wrap items-center justify-center gap-2 max-w-4xl">
+            <div className="flex items-center gap-1.5 bg-white border border-stone-200 px-3 py-1.5 rounded-2xl shadow-2xs">
+              <span className="text-stone-400 font-semibold text-[11px] flex items-center gap-1">
+                <span>📍</span> District:
+              </span>
+              <select
+                value={selectedDistrict}
+                onChange={(e) => {
+                  setSelectedDistrict(e.target.value);
+                  setSelectedBlock("All");
+                }}
+                className="bg-transparent text-xs font-bold text-slate-800 outline-none cursor-pointer"
+              >
+                {availableDistricts.map((d) => (
+                  <option key={d} value={d}>
+                    {d === "All" ? "All Districts" : `${d} (UP)`}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {selectedDistrict !== "All" && availableBlocks.length > 1 && (
+              <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-2xl shadow-2xs">
+                <span className="text-emerald-800 font-bold text-[11px] flex items-center gap-1">
+                  <span>🌾</span> Block / Tehsil:
+                </span>
+                <select
+                  value={selectedBlock}
+                  onChange={(e) => setSelectedBlock(e.target.value)}
+                  className="bg-transparent text-xs font-extrabold text-emerald-900 outline-none cursor-pointer"
+                >
+                  {availableBlocks.map((b) => (
+                    <option key={b} value={b}>
+                      {b === "All" ? `All Blocks in ${selectedDistrict}` : b}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {(selectedDistrict !== "All" || selectedBlock !== "All") && (
+              <button
+                onClick={() => {
+                  setSelectedDistrict("All");
+                  setSelectedBlock("All");
+                }}
+                className="text-[11px] font-bold text-rose-600 hover:text-rose-700 underline cursor-pointer px-1"
+              >
+                Reset Location
+              </button>
+            )}
           </div>
 
           {/* Secondary Filter Bar: Brand, HP, Availability & Max Price */}

@@ -7,6 +7,7 @@ import { useLanguage } from "../context/LanguageContext"
 import PaymentModal from "../Components/PaymentModal"
 import toast from "react-hot-toast"
 import { motion } from 'motion/react'
+import { getShortLocation } from "../data/indiaLocations"
 
 const defaultImplementsList = [
   {
@@ -305,12 +306,17 @@ const TractorDetails = () => {
 
           {/* Quick Header Actions: WhatsApp & Location */}
           <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-stone-200 shadow-xs">
-            <div className="flex items-center gap-2 text-xs font-bold text-stone-700">
+            <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-stone-700">
               <span className="text-base">📍</span>
-              <span>{lang === 'hi' ? 'उपकरण स्थान:' : 'Equipment Base:'}</span>
+              <span>{lang === 'hi' ? 'उपकरण आधार स्थान:' : 'Machinery Base:'}</span>
               <span className="text-emerald-800 font-extrabold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
                 {tractor.location || 'Uttar Pradesh'}
               </span>
+              {tractor.block && (
+                <span className="text-[10px] font-bold text-stone-600 bg-stone-100 px-2 py-0.5 rounded-md border border-stone-200">
+                  Tehsil / Block: {tractor.block}
+                </span>
+              )}
             </div>
 
             <a
@@ -672,6 +678,9 @@ const TractorDetails = () => {
                 className="border border-stone-200 px-3 py-2 rounded-xl text-xs font-semibold outline-none focus:border-emerald-600 text-slate-800 bg-stone-50"
                 placeholder="0 km (Self pickup / Near base)"
               />
+              <p className="text-[10px] text-stone-400">
+                Estimated distance from base ({getShortLocation(tractor)}) to your farmland
+              </p>
             </div>
 
             {/* Transparent Live Cost Breakdown */}

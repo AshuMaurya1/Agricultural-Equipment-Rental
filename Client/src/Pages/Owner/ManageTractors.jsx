@@ -1,8 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import Title from "../../Components/owner/Title";
 import { assets } from "../../assets/assets";
 import { useAppContext } from "../../context/AppContext";
 import { toast } from "react-hot-toast";
+import {
+  getStates,
+  getDistricts,
+  getBlocks,
+  formatLocation,
+  parseLocation,
+  getShortLocation,
+} from "../../data/indiaLocations";
 
 const ManageTractors = () => {
   const { isOwner, axios, currency } = useAppContext();
@@ -78,6 +86,26 @@ const ManageTractors = () => {
     }
   };
 
+  const startEditingTractor = (tractor) => {
+    const parsed = parseLocation(tractor.location || '');
+    const state = tractor.state || parsed.state || 'Uttar Pradesh';
+    const district = tractor.district || parsed.district || '';
+    const block = tractor.block || parsed.block || '';
+
+    const knownBlocks = getBlocks(state, district);
+    const isCustom = block && !knownBlocks.includes(block);
+
+    setEditingTractor({
+      ...tractor,
+      state,
+      district,
+      block: isCustom ? '__custom__' : block,
+      _isCustomBlock: isCustom,
+      _customBlock: isCustom ? block : '',
+      villageOrLandmark: tractor.villageOrLandmark || '',
+    });
+  };
+
   // Handle Edit form submission
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
@@ -85,12 +113,27 @@ const ManageTractors = () => {
 
     try {
       setIsUpdating(true);
+      const effectiveBlock = editingTractor.block === '__custom__'
+        ? (editingTractor._customBlock || '').trim()
+        : (editingTractor.block || '').trim();
+
+      const updatedLocation = formatLocation({
+        block: effectiveBlock,
+        district: editingTractor.district,
+        state: editingTractor.state || 'Uttar Pradesh',
+        village: editingTractor.villageOrLandmark || '',
+      });
+
       const { data } = await axios.put(`/api/owner/tractors/${editingTractor._id}`, {
         pricePerDay: Number(editingTractor.pricePerDay),
         pricePerHour: Number(editingTractor.pricePerHour),
         pricePerAcre: Number(editingTractor.pricePerAcre),
         horsePower: Number(editingTractor.horsePower),
-        location: editingTractor.location,
+        state: editingTractor.state || 'Uttar Pradesh',
+        district: editingTractor.district,
+        block: effectiveBlock,
+        villageOrLandmark: editingTractor.villageOrLandmark || '',
+        location: updatedLocation,
         description: editingTractor.description,
         category: editingTractor.category,
       });
@@ -153,7 +196,7 @@ const ManageTractors = () => {
                   </span>
                 </div>
                 <p className="text-xs text-stone-500 mt-0.5">
-                  ⚡ {tractor.horsePower || 50} HP · 📍 {tractor.location || "UP"}
+                  ⚡ {tractor.horsePower || 50} HP · 📍 {getShortLocation(tractor)}
                 </p>
                 <div className="mt-1 text-xs font-black text-slate-900">
                   {currency}{tractor.pricePerDay}<span className="text-stone-400 font-normal">/day</span>
@@ -176,7 +219,7 @@ const ManageTractors = () => {
 
               <button
                 title="Edit Machine Details"
-                onClick={() => setEditingTractor({ ...tractor })}
+                onClick={() => startEditingTractor(tractor)}
                 className="p-2 border border-stone-200 hover:bg-stone-100 rounded-xl transition cursor-pointer text-stone-600"
               >
                 <img src={assets.Edit} alt="Edit" className="w-4 h-4 opacity-75" />
@@ -247,7 +290,7 @@ const ManageTractors = () => {
                         {tractor.brand} {tractor.model}
                       </p>
                       <p className="text-xs text-stone-500 mt-0.5">
-                        {tractor.year || 2023} • 📍 {tractor.location || "Uttar Pradesh"}
+                        {tractor.year || 2023} • 📍 {getShortLocation(tractor)}
                       </p>
                     </div>
                   </td>
@@ -293,7 +336,7 @@ const ManageTractors = () => {
 
                       <button
                         title="Edit Machine Details"
-                        onClick={() => setEditingTractor({ ...tractor })}
+                        onClick={() => startEditingTractor(tractor)}
                         className="p-2 hover:bg-stone-100 rounded-xl transition cursor-pointer text-stone-600 hover:text-stone-900"
                       >
                         <img src={assets.Edit} alt="Edit" className="w-4 h-4 opacity-75 hover:opacity-100" />
@@ -390,33 +433,127 @@ const ManageTractors = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[11px] font-bold text-stone-700 mb-1">
-                    Engine Power (HP)
+              <div>
+                <label className="block text-[11px] font-bold text-stone-700 mb-1">
+                  Engine Power (HP)
+                </label>
+                <input
+                  type="number"
+                  value={editingTractor.horsePower || ""}
+                  onChange={(e) =>
+                    setEditingTractor({ ...editingTractor, horsePower: e.target.value })
+                  }
+                  className="w-full border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold outline-none focus:border-emerald-600 bg-stone-50"
+                />
+              </div>
+
+              {/* State -> District -> Block Location Editor */}
+              <div className="bg-stone-50 p-3 rounded-2xl border border-stone-200 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="block text-[11px] font-bold text-stone-700">
+                    📍 Base Location (State &rarr; District &rarr; Block)
                   </label>
-                  <input
-                    type="number"
-                    value={editingTractor.horsePower || ""}
-                    onChange={(e) =>
-                      setEditingTractor({ ...editingTractor, horsePower: e.target.value })
-                    }
-                    className="w-full border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold outline-none focus:border-emerald-600 bg-stone-50"
-                  />
+                  {editingTractor.district && (
+                    <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-md">
+                      {editingTractor.block === '__custom__'
+                        ? (editingTractor._customBlock || '')
+                        : editingTractor.block}, {editingTractor.district}
+                    </span>
+                  )}
                 </div>
-                <div>
-                  <label className="block text-[11px] font-bold text-stone-700 mb-1">
-                    District Location
-                  </label>
-                  <input
-                    type="text"
-                    value={editingTractor.location || ""}
-                    onChange={(e) =>
-                      setEditingTractor({ ...editingTractor, location: e.target.value })
-                    }
-                    className="w-full border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold outline-none focus:border-emerald-600 bg-stone-50"
-                  />
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-[10px] font-bold text-stone-500 mb-0.5">State</label>
+                    <select
+                      value={editingTractor.state || 'Uttar Pradesh'}
+                      onChange={(e) =>
+                        setEditingTractor({
+                          ...editingTractor,
+                          state: e.target.value,
+                          district: '',
+                          block: '',
+                          _customBlock: '',
+                        })
+                      }
+                      className="w-full border border-stone-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold outline-none focus:border-emerald-600 bg-white"
+                    >
+                      {getStates().map((st) => (
+                        <option key={st} value={st}>
+                          {st}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-stone-500 mb-0.5">District</label>
+                    <select
+                      value={editingTractor.district || ''}
+                      onChange={(e) =>
+                        setEditingTractor({
+                          ...editingTractor,
+                          district: e.target.value,
+                          block: '',
+                          _customBlock: '',
+                        })
+                      }
+                      className="w-full border border-stone-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold outline-none focus:border-emerald-600 bg-white"
+                    >
+                      <option value="">Select District</option>
+                      {getDistricts(editingTractor.state || 'Uttar Pradesh').map((dist) => (
+                        <option key={dist} value={dist}>
+                          {dist}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-stone-500 mb-0.5">Block / Tehsil</label>
+                    <select
+                      value={editingTractor.block || ''}
+                      disabled={!editingTractor.district}
+                      onChange={(e) =>
+                        setEditingTractor({
+                          ...editingTractor,
+                          block: e.target.value,
+                        })
+                      }
+                      className="w-full border border-stone-200 rounded-xl px-2.5 py-1.5 text-xs font-semibold outline-none focus:border-emerald-600 bg-white disabled:bg-stone-100"
+                    >
+                      <option value="">Select Block</option>
+                      {getBlocks(editingTractor.state || 'Uttar Pradesh', editingTractor.district || '').map(
+                        (blk) => (
+                          <option key={blk} value={blk}>
+                            {blk}
+                          </option>
+                        )
+                      )}
+                      <option value="__custom__">➕ Custom Block</option>
+                    </select>
+                  </div>
                 </div>
+
+                {editingTractor.block === '__custom__' && (
+                  <div>
+                    <label className="block text-[10px] font-bold text-emerald-800 mb-0.5">
+                      Type Custom Block Name
+                    </label>
+                    <input
+                      type="text"
+                      value={editingTractor._customBlock || ''}
+                      onChange={(e) =>
+                        setEditingTractor({
+                          ...editingTractor,
+                          _customBlock: e.target.value,
+                        })
+                      }
+                      placeholder="e.g. Pindra"
+                      className="w-full border border-emerald-300 rounded-xl px-3 py-1.5 text-xs font-semibold outline-none focus:border-emerald-600 bg-white"
+                    />
+                  </div>
+                )}
               </div>
 
               <div>

@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Title from "../../Components/owner/Title";
 import { assets } from "../../assets/assets";
 import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
-
-const upDistricts = [
-  "Agra", "Aligarh", "Ambedkar Nagar", "Amethi", "Amroha", "Auraiya", "Ayodhya", "Azamgarh", "Baghpat", "Bahraich", "Ballia", "Balrampur", "Banda", "Barabanki", "Bareilly", "Basti", "Bhadohi", "Bijnor", "Budaun", "Bulandshahr", "Chandauli", "Chitrakoot", "Deoria", "Etah", "Etawah", "Farrukhabad", "Fatehpur", "Firozabad", "Gautam Buddha Nagar", "Ghaziabad", "Ghazipur", "Gonda", "Gorakhpur", "Hamirpur", "Hapur", "Hardoi", "Hathras", "Jalaun", "Jaunpur", "Jhansi", "Kannauj", "Kanpur Dehat", "Kanpur Nagar", "Kasganj", "Kaushambi", "Kheri", "Kushinagar", "Lalitpur", "Lucknow", "Maharajganj", "Mahoba", "Mainpuri", "Mathura", "Mau", "Meerut", "Mirzapur", "Moradabad", "Muzaffarnagar", "Pilibhit", "Pratapgarh", "Prayagraj", "Raebareli", "Rampur", "Saharanpur", "Sambhal", "Sant Kabir Nagar", "Shahjahanpur", "Shamli", "Shravasti", "Siddharthnagar", "Sitapur", "Sonbhadra", "Sultanpur", "Unnao", "Varanasi",
-];
+import {
+  getStates,
+  getDistricts,
+  getBlocks,
+  formatLocation,
+} from "../../data/indiaLocations";
 
 const tractorCategories = [
   "Compact Tractor (Under 35 HP)",
@@ -23,6 +25,13 @@ const AddTractor = () => {
 
   const [image, setImage] = useState(null);
 
+  // Granular Location States
+  const [selectedState, setSelectedState] = useState("Uttar Pradesh");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedBlock, setSelectedBlock] = useState("");
+  const [customBlock, setCustomBlock] = useState("");
+  const [villageOrLandmark, setVillageOrLandmark] = useState("");
+
   const [tractor, setTractor] = useState({
     brand: "",
     model: "",
@@ -36,15 +45,48 @@ const AddTractor = () => {
     transmission: "Manual",
     fuelType: "Diesel",
     seatingCapacity: "1",
-    location: "",
     description: "",
   });
+
+  const availableStates = useMemo(() => getStates(), []);
+  const availableDistricts = useMemo(() => getDistricts(selectedState), [selectedState]);
+  const availableBlocks = useMemo(
+    () => getBlocks(selectedState, selectedDistrict),
+    [selectedState, selectedDistrict]
+  );
+
+  const effectiveBlock = selectedBlock === "__custom__" ? customBlock.trim() : selectedBlock.trim();
+
+  // Formatted location summary string
+  const currentLocationPreview = useMemo(() => {
+    return formatLocation({
+      village: villageOrLandmark,
+      block: effectiveBlock,
+      district: selectedDistrict,
+      state: selectedState,
+    });
+  }, [villageOrLandmark, effectiveBlock, selectedDistrict, selectedState]);
 
   const handleChange = (e) => {
     setTractor({
       ...tractor,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleStateChange = (e) => {
+    const newState = e.target.value;
+    setSelectedState(newState);
+    setSelectedDistrict("");
+    setSelectedBlock("");
+    setCustomBlock("");
+  };
+
+  const handleDistrictChange = (e) => {
+    const newDistrict = e.target.value;
+    setSelectedDistrict(newDistrict);
+    setSelectedBlock("");
+    setCustomBlock("");
   };
 
   const [isLoading, setIsLoading] = useState(false);
@@ -66,8 +108,29 @@ const AddTractor = () => {
       return;
     }
 
+    if (!selectedState) {
+      toast.error("Please select a State.");
+      return;
+    }
+    if (!selectedDistrict) {
+      toast.error("Please select a District.");
+      return;
+    }
+    if (!effectiveBlock) {
+      toast.error("Please select or enter your Block / Tehsil.");
+      return;
+    }
+
     if (isLoading) return;
     setIsLoading(true);
+
+    const fullLocationString = formatLocation({
+      village: villageOrLandmark,
+      block: effectiveBlock,
+      district: selectedDistrict,
+      state: selectedState,
+    });
+
     const formData = new FormData();
     formData.append(
       "tractorData",
@@ -80,6 +143,11 @@ const AddTractor = () => {
         pricePerAcre: Number(tractor.pricePerAcre) || 1200,
         transportRatePerKm: Number(tractor.transportRatePerKm) || 40,
         seatingCapacity: Number(tractor.seatingCapacity) || 1,
+        state: selectedState,
+        district: selectedDistrict,
+        block: effectiveBlock,
+        villageOrLandmark: villageOrLandmark.trim(),
+        location: fullLocationString,
       })
     );
     formData.append("image", image);
@@ -89,6 +157,10 @@ const AddTractor = () => {
       if (data.success) {
         toast.success(data.message);
         setImage(null);
+        setSelectedDistrict("");
+        setSelectedBlock("");
+        setCustomBlock("");
+        setVillageOrLandmark("");
         setTractor({
           brand: "",
           model: "",
@@ -102,7 +174,6 @@ const AddTractor = () => {
           transmission: "Manual",
           fuelType: "Diesel",
           seatingCapacity: "1",
-          location: "",
           description: "",
         });
       } else {
@@ -317,23 +388,125 @@ const AddTractor = () => {
           </div>
         </div>
 
-        {/* Location */}
-        <div>
-          <label className="font-medium text-gray-700">Location (District in UP)</label>
-          <select
-            name="location"
-            value={tractor.location}
-            onChange={handleChange}
-            className="w-full border border-borderColor rounded-md px-3 py-2 mt-1 outline-none focus:border-primary bg-white"
-            required
-          >
-            <option value="">Select Location</option>
-            {upDistricts.map((district) => (
-              <option key={district} value={district}>
-                {district}
-              </option>
-            ))}
-          </select>
+        {/* State -> District -> Block Location Hierarchy */}
+        <div className="bg-emerald-50/40 p-4 sm:p-5 rounded-2xl border border-emerald-100 flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <label className="font-bold text-gray-800 flex items-center gap-1.5 text-sm">
+                <span>📍</span> Machinery Base Location (State &rarr; District &rarr; Block)
+              </label>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Exact block/tehsil helps farmers within 15-30 km find your tractor with low delivery costs.
+              </p>
+            </div>
+            {selectedDistrict && effectiveBlock && (
+              <span className="text-[11px] font-extrabold bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200 truncate max-w-xs">
+                📍 {effectiveBlock}, {selectedDistrict}
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            {/* 1. State */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">State *</label>
+              <select
+                value={selectedState}
+                onChange={handleStateChange}
+                className="w-full border border-borderColor rounded-md px-3 py-2 outline-none focus:border-primary bg-white text-xs sm:text-sm font-medium"
+                required
+              >
+                {availableStates.map((st) => (
+                  <option key={st} value={st}>
+                    {st}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* 2. District */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">District *</label>
+              <select
+                value={selectedDistrict}
+                onChange={handleDistrictChange}
+                className="w-full border border-borderColor rounded-md px-3 py-2 outline-none focus:border-primary bg-white text-xs sm:text-sm font-medium"
+                required
+              >
+                <option value="">Select District</option>
+                {availableDistricts.map((dist) => (
+                  <option key={dist} value={dist}>
+                    {dist}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* 3. Block / Tehsil */}
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">Block / Tehsil *</label>
+              <select
+                value={selectedBlock}
+                onChange={(e) => setSelectedBlock(e.target.value)}
+                disabled={!selectedDistrict}
+                className="w-full border border-borderColor rounded-md px-3 py-2 outline-none focus:border-primary bg-white text-xs sm:text-sm font-medium disabled:bg-gray-100 disabled:cursor-not-allowed"
+                required
+              >
+                <option value="">
+                  {selectedDistrict ? "Select Block / Tehsil" : "Choose district first"}
+                </option>
+                {availableBlocks.map((blk) => (
+                  <option key={blk} value={blk}>
+                    {blk}
+                  </option>
+                ))}
+                <option value="__custom__">➕ Other / Enter Custom Block</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Custom Block Input when selectedBlock is '__custom__' */}
+          {selectedBlock === "__custom__" && (
+            <div className="mt-1">
+              <label className="block text-xs font-semibold text-emerald-800 mb-1">
+                Enter Custom Block / Tehsil Name *
+              </label>
+              <input
+                type="text"
+                value={customBlock}
+                onChange={(e) => setCustomBlock(e.target.value)}
+                placeholder="e.g. Pindra, Kasimabad, or your Tehsil"
+                className="w-full border border-emerald-300 rounded-md px-3 py-2 outline-none focus:border-primary bg-white text-xs sm:text-sm"
+                required
+              />
+            </div>
+          )}
+
+          {/* Optional Village / Landmark / Formatted Preview */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-1 border-t border-emerald-100/70">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                Village / Landmark / Farm Base (Optional)
+              </label>
+              <input
+                type="text"
+                value={villageOrLandmark}
+                onChange={(e) => setVillageOrLandmark(e.target.value)}
+                placeholder="e.g. Near Phoolpur Bazar, Village Babatpur"
+                className="w-full border border-borderColor rounded-md px-3 py-2 outline-none focus:border-primary bg-white text-xs sm:text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">
+                Formatted Platform Location
+              </label>
+              <div className="w-full bg-white/80 border border-stone-200 rounded-md px-3 py-2 text-xs text-stone-700 font-semibold truncate flex items-center gap-1.5 h-[38px]">
+                <span className="text-emerald-600 font-bold">✓</span>
+                <span className="truncate">{currentLocationPreview || "Select location above"}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Description */}

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { assets } from '../assets/assets'
 import { useAppContext } from '../context/AppContext'
 import { useLanguage } from '../context/LanguageContext'
+import { getShortLocation } from '../data/indiaLocations'
 
 const TractorCard = ({ tractor }) => {
   const { currency } = useAppContext()
@@ -21,10 +22,12 @@ const TractorCard = ({ tractor }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const shortLocation = getShortLocation(tractor)
+
   const handleWhatsAppInquiry = (e) => {
     e.stopPropagation()
     const text = encodeURIComponent(
-      `Namaste, I am interested in renting the ${tractor.brand} ${tractor.model} (${hp} HP) from TractorHub.`
+      `Namaste, I am interested in renting the ${tractor.brand} ${tractor.model} (${hp} HP) in ${shortLocation} from TractorHub.`
     )
     window.open(`https://wa.me/918000000000?text=${text}`, '_blank')
   }
@@ -67,9 +70,9 @@ const TractorCard = ({ tractor }) => {
         </div>
 
         {/* Top Right: Location Pill */}
-        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-xs text-slate-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs flex items-center gap-1">
+        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-xs text-slate-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs flex items-center gap-1 max-w-[180px] truncate">
           <span>📍</span>
-          <span>{tractor.location || 'Uttar Pradesh'}</span>
+          <span className="truncate">{shortLocation}</span>
         </div>
 
         {/* Bottom Image Overlay: Multi-rate preview badge */}

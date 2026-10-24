@@ -1,20 +1,29 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { assets, cityList } from '../assets/assets'
 import { useAppContext } from '../context/AppContext'
 import { useLanguage } from '../context/LanguageContext'
 import { motion } from 'motion/react'
 import { Link } from 'react-router-dom'
+import { getDistricts, getBlocks } from '../data/indiaLocations'
 
 const Hero = () => {
-  const [pickupLocation, setPickupLocation] = useState('')
+  const [selectedDistrict, setSelectedDistrict] = useState('')
+  const [selectedBlock, setSelectedBlock] = useState('')
   const [rentalType, setRentalType] = useState('day') // 'day' | 'hour' | 'acre'
   const { pickupDate, setPickupDate, returnDate, setReturnDate, navigate } = useAppContext()
   const { t, lang } = useLanguage()
 
+  const allDistricts = useMemo(() => getDistricts('Uttar Pradesh'), [])
+  const availableBlocks = useMemo(() => {
+    if (!selectedDistrict) return []
+    return getBlocks('Uttar Pradesh', selectedDistrict)
+  }, [selectedDistrict])
+
   const handleSearch = (e) => {
     e.preventDefault()
     const searchParams = new URLSearchParams()
-    if (pickupLocation) searchParams.set('pickupLocation', pickupLocation)
+    const finalLocation = selectedBlock ? `${selectedBlock}, ${selectedDistrict}` : selectedDistrict
+    if (finalLocation) searchParams.set('pickupLocation', finalLocation)
     if (pickupDate) searchParams.set('pickupDate', pickupDate)
     if (returnDate) searchParams.set('returnDate', returnDate)
     if (rentalType) searchParams.set('unit', rentalType)
@@ -242,25 +251,54 @@ const Hero = () => {
           {/* Search Inputs Form (Responsive Grid) */}
           <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 items-center">
             
-            {/* Field 1: District / Location */}
+            {/* Field 1: District & Optional Block Location */}
             <div className="sm:col-span-2 lg:col-span-4 flex flex-col justify-center p-3 rounded-2xl bg-stone-50 border border-stone-200 hover:border-emerald-500 transition">
-              <label htmlFor="hero-district" className="text-[11px] font-bold text-stone-500 uppercase tracking-wider flex items-center gap-1">
-                <span>📍</span> {t('pickupLocation')}
-              </label>
-              <select
-                id="hero-district"
-                value={pickupLocation}
-                onChange={(e) => setPickupLocation(e.target.value)}
-                className="mt-1 bg-transparent text-sm font-semibold text-slate-900 outline-none cursor-pointer w-full"
-                required
-              >
-                <option value="">{t('pickupLocationPlaceholder')}</option>
-                {cityList.map((city) => (
-                  <option value={city.name} key={city.name}>
-                    {city.name} (UP)
-                  </option>
-                ))}
-              </select>
+              <div className="flex items-center justify-between">
+                <label htmlFor="hero-district" className="text-[11px] font-bold text-stone-500 uppercase tracking-wider flex items-center gap-1">
+                  <span>📍</span> {t('pickupLocation')}
+                </label>
+                {selectedBlock && (
+                  <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100/80 px-2 py-0.2 rounded-full border border-emerald-200 truncate max-w-[110px]">
+                    {selectedBlock}
+                  </span>
+                )}
+              </div>
+              <div className="mt-1 flex gap-1.5 items-center">
+                <select
+                  id="hero-district"
+                  value={selectedDistrict}
+                  onChange={(e) => {
+                    setSelectedDistrict(e.target.value)
+                    setSelectedBlock('')
+                  }}
+                  className="bg-transparent text-sm font-semibold text-slate-900 outline-none cursor-pointer w-full truncate"
+                  required
+                >
+                  <option value="">{t('pickupLocationPlaceholder')}</option>
+                  {allDistricts.map((district) => (
+                    <option value={district} key={district}>
+                      {district} (UP)
+                    </option>
+                  ))}
+                </select>
+
+                {availableBlocks.length > 0 && (
+                  <select
+                    id="hero-block"
+                    value={selectedBlock}
+                    onChange={(e) => setSelectedBlock(e.target.value)}
+                    className="bg-white border border-stone-200 text-xs font-semibold text-emerald-900 outline-none cursor-pointer rounded-lg px-2 py-1 max-w-[125px] shrink-0 shadow-2xs"
+                    title="Choose specific Block / Tehsil (Optional)"
+                  >
+                    <option value="">All Blocks</option>
+                    {availableBlocks.map((blk) => (
+                      <option key={blk} value={blk}>
+                        {blk}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
             </div>
 
             {/* Field 2: Pickup Date */}
