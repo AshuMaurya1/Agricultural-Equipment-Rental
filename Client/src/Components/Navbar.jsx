@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { assets } from '../assets/assets'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAppContext } from '../context/AppContext'
@@ -13,6 +13,22 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const [navSearch, setNavSearch] = useState('');
+
+  // Keep the menu state in sync with navigation and prevent the page behind the
+  // mobile drawer from scrolling while the drawer is open.
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [open]);
 
   const menuLinks = [
     { name: t('home'), path: '/' },
@@ -62,7 +78,7 @@ const Navbar = () => {
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="sticky top-0 z-50 glass-nav border-b border-stone-200/80 shadow-xs"
+      className="fixed inset-x-0 top-0 z-50 glass-nav border-b border-stone-200/80 shadow-xs"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between px-3 sm:px-6 lg:px-8 py-3">
         {/* Brand Logo & Tagline */}
@@ -222,7 +238,7 @@ const Navbar = () => {
 
       {/* Mobile Drawer (Visible on < md) */}
       <div
-        className={`md:hidden fixed inset-x-0 top-[57px] sm:top-[61px] h-[calc(100vh-57px)] sm:h-[calc(100vh-61px)] bg-white/98 backdrop-blur-xl border-t border-stone-200 flex flex-col justify-between p-5 overflow-y-auto transition-all duration-300 z-50 ${
+        className={`md:hidden fixed inset-x-0 top-16 h-[calc(100vh-4rem)] bg-white/98 backdrop-blur-xl border-t border-stone-200 flex flex-col justify-between p-5 overflow-y-auto transition-all duration-300 z-50 ${
           open ? 'translate-x-0 opacity-100 pointer-events-auto' : 'translate-x-full opacity-0 pointer-events-none'
         }`}
       >

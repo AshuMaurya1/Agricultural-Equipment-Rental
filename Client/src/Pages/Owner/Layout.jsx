@@ -14,7 +14,7 @@ const Layout = () => {
   }, [isOwner, navigate])
 
   return (
-    <div className="flex flex-col min-h-screen bg-stone-50">
+    <div className="flex flex-col min-h-screen bg-stone-50 pt-[69px]">
       <NavbarOwner />
       <div className="flex flex-1 min-h-[calc(100vh-65px)]">
         <SideBar />

@@ -6,7 +6,7 @@ const NavbarOwner = () => {
   const { user } = useAppContext()
 
   return (
-    <header className="sticky top-0 z-40 glass-nav border-b border-stone-200/80 shadow-xs px-4 sm:px-6 lg:px-8 py-3.5">
+    <header className="fixed inset-x-0 top-0 z-40 glass-nav border-b border-stone-200/80 shadow-xs px-4 sm:px-6 lg:px-8 py-3.5">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 group">
           <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-800 flex items-center justify-center text-white shadow-md shadow-emerald-700/20">

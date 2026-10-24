@@ -36,7 +36,7 @@ const App = () => {
 
       {!isOwnerPath && <Navbar />}
 
-      <main className="flex-1 w-full max-w-full">
+      <main className={`flex-1 w-full max-w-full ${!isOwnerPath ? 'pt-16' : ''}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/tractor-details/:id" element={<TractorDetails />} />
