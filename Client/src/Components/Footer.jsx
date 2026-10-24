@@ -32,6 +32,10 @@ const Footer = () => {
     },
   ];
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <footer className="px-4 sm:px-6 md:px-12 lg:px-20 xl:px-32 border-t border-stone-200 mt-12 bg-white">
       <div className="flex flex-col lg:flex-row justify-between gap-8 py-10 border-b border-stone-200">
@@ -42,7 +46,7 @@ const Footer = () => {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="lg:w-[36%]"
         >
-          <Link to="/" className="flex items-center gap-2 group">
+          <Link to="/" onClick={scrollToTop} className="flex items-center gap-2 group">
             <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-800 flex items-center justify-center text-white shadow-md shadow-emerald-700/20">
               <span className="text-lg">🚜</span>
             </div>
@@ -72,7 +76,11 @@ const Footer = () => {
                 {section.links.map((link, i) => (
                   <li key={i}>
                     {link.href.startsWith("/") ? (
-                      <Link to={link.href} className="hover:text-emerald-700 transition">
+                      <Link
+                        to={link.href}
+                        onClick={scrollToTop}
+                        className="hover:text-emerald-700 transition"
+                      >
                         {link.label}
                       </Link>
                     ) : (

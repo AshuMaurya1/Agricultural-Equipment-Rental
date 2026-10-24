@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import Navbar from './Components/Navbar'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Home from './Pages/Home'
@@ -16,13 +17,20 @@ import { useAppContext } from './context/AppContext'
 import SecuritySessions from './Pages/SecuritySessions'
 import ResetPassword from './Pages/ResetPassword'
 import VerifyEmail from './Pages/VerifyEmail'
+import FloatingHelpline from './Components/FloatingHelpline'
 
 const App = () => {
   const { showLogin } = useAppContext()
-  const isOwnerPath = useLocation().pathname.startsWith('/owner')
+  const location = useLocation()
+  const isOwnerPath = location.pathname.startsWith('/owner')
+
+  // Smoothly scroll to top whenever the route or page changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [location.pathname])
 
   return (
-    <div className="min-h-screen flex flex-col justify-between overflow-x-hidden w-full max-w-full">
+    <div className="min-h-screen flex flex-col justify-between overflow-x-hidden w-full max-w-full relative">
       <Toaster position="top-right" />
       {showLogin && <Login />}
 
